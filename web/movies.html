@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movies - Movirra</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        :root {
+            --background: 222.2 84% 4.9%;
+            --foreground: 210 40% 98%;
+            --card: 222.2 84% 4.9%;
+            --card-foreground: 210 40% 98%;
+            --popover: 222.2 84% 4.9%;
+            --popover-foreground: 210 40% 98%;
+            --primary: 210 40% 98%;
+            --primary-foreground: 222.2 84% 4.9%;
+            --secondary: 217.2 32.6% 17.5%;
+            --secondary-foreground: 210 40% 98%;
+            --muted: 217.2 32.6% 17.5%;
+            --muted-foreground: 215 20.2% 65.1%;
+            --accent: 217.2 32.6% 17.5%;
+            --accent-foreground: 210 40% 98%;
+            --destructive: 0 62.8% 30.6%;
+            --destructive-foreground: 210 40% 98%;
+            --border: 217.2 32.6% 17.5%;
+            --input: 217.2 32.6% 17.5%;
+            --ring: 212.7 26.8% 83.9%;
+            --chart-1: 220 70% 50%;
+            --chart-2: 160 60% 45%;
+            --chart-3: 30 80% 55%;
+            --chart-4: 280 65% 60%;
+            --chart-5: 340 75% 55%;
+        }
+
+        body {
+            background-color: hsl(var(--background));
+            color: hsl(var(--foreground));
+        }
+
+        .bg-background { background-color: hsl(var(--background)); }
+        .text-foreground { color: hsl(var(--foreground)); }
+        .bg-card { background-color: hsl(var(--card)); }
+        .text-card-foreground { color: hsl(var(--card-foreground)); }
+        .bg-primary { background-color: hsl(var(--primary)); }
+        .text-primary-foreground { color: hsl(var(--primary-foreground)); }
+        .bg-secondary { background-color: hsl(var(--secondary)); }
+        .text-secondary-foreground { color: hsl(var(--secondary-foreground)); }
+        .bg-muted { background-color: hsl(var(--muted)); }
+        .text-muted-foreground { color: hsl(var(--muted-foreground)); }
+        .border-border { border-color: hsl(var(--border)); }
+        .bg-accent { background-color: hsl(var(--accent)); }
+        .text-accent-foreground { color: hsl(var(--accent-foreground)); }
+
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+
+        .movie-card {
+            transition: all 0.3s ease;
+        }
+        .movie-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+        }
+
+        .nav-link {
+            position: relative;
+            transition: color 0.3s ease;
+        }
+        .nav-link:hover {
+            color: hsl(var(--primary));
+        }
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            border-radius: 1px;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border: none;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid hsl(var(--border));
+            transition: all 0.3s ease;
+        }
+        .btn-outline:hover {
+            background: hsl(var(--accent));
+            border-color: hsl(var(--primary));
+        }
+
+        .filter-btn {
+            transition: all 0.3s ease;
+        }
+        .filter-btn.active {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: white;
+        }
+
+        .search-input {
+            background: hsl(var(--card));
+            border: 1px solid hsl(var(--border));
+            transition: all 0.3s ease;
+        }
+        .search-input:focus {
+            border-color: hsl(var(--primary));
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .grid-cols-6 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .grid-cols-6 {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .pagination-btn {
+            transition: all 0.3s ease;
+        }
+        .pagination-btn:hover {
+            background: hsl(var(--accent));
+            color: hsl(var(--primary));
+        }
+        .pagination-btn.active {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: white;
+        }
+    </style>
+</head>
+<body class="bg-background text-foreground">
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex items-center">
+                    <h1 class="text-2xl font-bold gradient-text"><a href="{% url 'home' %}">Movirra</a></h1>
+                </div>
+
+                <!-- Navigation Links -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="{% url 'home' %}" class="nav-link text-muted-foreground hover:text-foreground">Home</a>
+                    <a href="{% url 'movies' %}" class="nav-link text-foreground active">Movies</a>
+                    <a href="#" class="nav-link text-muted-foreground hover:text-foreground">Series</a>
+                </div>
+
+                <!-- Search and User -->
+                <div class="flex items-center space-x-4">
+                    <div class="relative hidden sm:block">
+                        <i data-lucide="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground"></i>
+                        <input 
+                            type="text" 
+                            placeholder="Search movies..." 
+                            class="search-input pl-10 pr-4 py-2 rounded-lg text-sm focus:outline-none w-64"
+                            id="search-input"
+                        >
+                    </div>
+                    <button class="p-2 rounded-lg hover:bg-accent">
+                        <i data-lucide="user" class="w-5 h-5"></i>
+                    </button>
+                    <button class="p-2 rounded-lg hover:bg-accent md:hidden">
+                        <i data-lucide="menu" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="pt-20 pb-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Header -->
+            <div class="mb-8">
+                <h1 class="text-4xl font-bold mb-4">All Movies</h1>
+                <p class="text-muted-foreground text-lg">Discover thousands of movies across all genres</p>
+            </div>
+
+            <!-- Filters -->
+            <div class="mb-8">
+                <div class="flex flex-wrap gap-4 mb-6">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-sm font-medium">Genre:</span>
+                        <div class="flex flex-wrap gap-2" id="genre-filters">
+                            <button class="filter-btn active px-4 py-2 rounded-lg text-sm" data-genre="all">All</button>
+                            <button class="filter-btn px-4 py-2 rounded-lg text-sm bg-secondary" data-genre="action">Action</button>
+                            <button class="filter-btn px-4 py-2 rounded-lg text-sm bg-secondary" data-genre="anime">Anime</button>
+                            <button class="filter-btn px-4 py-2 rounded-lg text-sm bg-secondary" data-genre="drama">Drama</button>
+                            <button class="filter-btn px-4 py-2 rounded-lg text-sm bg-secondary" data-genre="comedy">Comedy</button>
+                            <button class="filter-btn px-4 py-2 rounded-lg text-sm bg-secondary" data-genre="thriller">Thriller</button>
+                            <button class="filter-btn px-4 py-2 rounded-lg text-sm bg-secondary" data-genre="horror">Horror</button>
+                            <button class="filter-btn px-4 py-2 rounded-lg text-sm bg-secondary" data-genre="sci-fi">Sci-Fi</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap gap-4 items-center">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-sm font-medium">Sort by:</span>
+                        <select class="search-input px-3 py-2 rounded-lg text-sm focus:outline-none" id="sort-select">
+                            <option value="popularity">Popularity</option>
+                            <option value="rating">Rating</option>
+                            <option value="year">Year</option>
+                            <option value="title">Title</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-sm font-medium">Year:</span>
+                        <select class="search-input px-3 py-2 rounded-lg text-sm focus:outline-none" id="year-filter">
+                            <option value="all">All Years</option>
+                            <option value="2024">2024</option>
+                            <option value="2023">2023</option>
+                            <option value="2022">2022</option>
+                            <option value="2021">2021</option>
+                            <option value="2020">2020</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Movies Grid -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6 mb-8">
+                {% for movie in all_movies %}
+                    <div class="movie-card bg-card rounded-lg overflow-hidden cursor-pointer fade-in" data-genre="{{ movie.genres.all|join:','|lower }}">
+                        <div class="relative group">
+                            <img src="{{ movie.poster_image.url }}" alt="{{ movie.title }}" class="w-full h-72 object-cover">
+                            <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                                <a href="{% url 'watch_video' video_id=movie.id %}">
+                                    <div class="text-center">
+                                        <i data-lucide="play" class="w-12 h-12 mx-auto mb-2 text-white"></i>
+                                        <a href="{% url 'watch_video' video_id=movie.id %}" class="text-white font-medium">Play Now</a>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="absolute top-2 right-2 bg-black/70 text-white px-2 py-1 rounded text-xs font-bold">
+                                {{ movie.rating|default:"-" }}
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <h3 class="font-semibold text-sm mb-1 line-clamp-2">{{ movie.title }}</h3>
+                            <p class="text-muted-foreground text-xs">{{ movie.release_date|date:"Y" }}</p>
+                        </div>
+                    </div>
+                {% empty %}
+                    <p class="text-gray-400 col-span-full">No movies found.</p>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            <div class="flex justify-center items-center space-x-2" id="pagination">
+                <!-- Pagination will be populated here -->
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Filter and sort movies
+        function filterAndSortMovies() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const selectedGenre = document.querySelector('.filter-btn.active').dataset.genre;
+            const selectedYear = document.getElementById('year-filter').value;
+            const sortBy = document.getElementById('sort-select').value;
+
+            // Filter movies
+            filteredMovies = allMovies.filter(movie => {
+                const matchesSearch = movie.title.toLowerCase().includes(searchTerm);
+                const matchesGenre = selectedGenre === 'all' || movie.genre === selectedGenre;
+                const matchesYear = selectedYear === 'all' || movie.year === selectedYear;
+                return matchesSearch && matchesGenre && matchesYear;
+            });
+
+            // Sort movies
+            filteredMovies.sort((a, b) => {
+                switch (sortBy) {
+                    case 'rating':
+                        return b.rating - a.rating;
+                    case 'year':
+                        return b.year.localeCompare(a.year);
+                    case 'title':
+                        return a.title.localeCompare(b.title);
+                    case 'popularity':
+                    default:
+                        return b.popularity - a.popularity;
+                }
+            });
+
+            currentPage = 1;
+            renderMovies();
+            renderPagination();
+            updateResultsCount();
+        }
+
+        // Render movies
+        function renderMovies() {
+            const startIndex = (currentPage - 1) * moviesPerPage;
+            const endIndex = startIndex + moviesPerPage;
+            const moviesToShow = filteredMovies.slice(startIndex, endIndex);
+
+            const moviesGrid = document.getElementById('movies-grid');
+            moviesGrid.innerHTML = moviesToShow.map(createMovieCard).join('');
+            
+            // Re-initialize Lucide icons for new content
+            lucide.createIcons();
+        }
+
+        // Render pagination
+        function renderPagination() {
+            const totalPages = Math.ceil(filteredMovies.length / moviesPerPage);
+            const pagination = document.getElementById('pagination');
+            
+            if (totalPages <= 1) {
+                pagination.innerHTML = '';
+                return;
+            }
+
+            let paginationHTML = '';
+
+            // Previous button
+            if (currentPage > 1) {
+                paginationHTML += `<button class="pagination-btn px-3 py-2 rounded-lg text-sm" onclick="changePage(${currentPage - 1})">Previous</button>`;
+            }
+
+            // Page numbers
+            const startPage = Math.max(1, currentPage - 2);
+            const endPage = Math.min(totalPages, currentPage + 2);
+
+            if (startPage > 1) {
+                paginationHTML += `<button class="pagination-btn px-3 py-2 rounded-lg text-sm" onclick="changePage(1)">1</button>`;
+                if (startPage > 2) {
+                    paginationHTML += `<span class="px-2 text-muted-foreground">...</span>`;
+                }
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                const activeClass = i === currentPage ? 'active' : '';
+                paginationHTML += `<button class="pagination-btn ${activeClass} px-3 py-2 rounded-lg text-sm" onclick="changePage(${i})">${i}</button>`;
+            }
+
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) {
+                    paginationHTML += `<span class="px-2 text-muted-foreground">...</span>`;
+                }
+                paginationHTML += `<button class="pagination-btn px-3 py-2 rounded-lg text-sm" onclick="changePage(${totalPages})">${totalPages}</button>`;
+            }
+
+            // Next button
+            if (currentPage < totalPages) {
+                paginationHTML += `<button class="pagination-btn px-3 py-2 rounded-lg text-sm" onclick="changePage(${currentPage + 1})">Next</button>`;
+            }
+
+            pagination.innerHTML = paginationHTML;
+        }
+
+        // Change page
+        function changePage(page) {
+            currentPage = page;
+            renderMovies();
+            renderPagination();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Update results count
+        function updateResultsCount() {
+            const resultsCount = document.getElementById('results-count');
+            resultsCount.textContent = `Showing ${filteredMovies.length} movies`;
+        }
+
+        // Play movie (placeholder function)
+        function playMovie(movieTitle) {
+            alert(`Playing: ${movieTitle}`);
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            const genreButtons = document.querySelectorAll('#genre-filters .filter-btn');
+            const movieCards = document.querySelectorAll('.movie-card');
+
+            genreButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // Remove active from all, add to clicked
+                    genreButtons.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+
+                    const selectedGenre = this.getAttribute('data-genre');
+                    movieCards.forEach(card => {
+                        const genres = card.getAttribute('data-genre');
+                        if (selectedGenre === 'all' || (genres && genres.includes(selectedGenre))) {
+                            card.style.display = '';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                });
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('search-input');
+    const movieCards = document.querySelectorAll('.movie-card');
+
+    searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        let visibleCount = 0;
+        movieCards.forEach(card => {
+            const title = card.querySelector('h3').textContent.toLowerCase();
+            if (title.includes(searchTerm)) {
+                card.style.display = '';
+                visibleCount++;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+        // Optionally update results count if you have it
+        const resultsCount = document.getElementById('results-count');
+        if (resultsCount) {
+            resultsCount.textContent = `Showing ${visibleCount} movies`;
+        }
+    });
+});
+    </script>
+</body>
+</html>

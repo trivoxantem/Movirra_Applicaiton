@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movirra - Your Movie Profile</title>
+    <meta name="description" content="Manage your Movirra movie profile - edit your information, favorite genres, and movie preferences">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Cinema-themed colors */
+            --bg-primary: #1a1f2e;
+            --bg-secondary: #242937;
+            --bg-card: #2a2f3e;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --cinema-gold: #fbbf24;
+            --cinema-purple: #8b5cf6;
+            --cinema-red: #ef4444;
+            --cinema-blue: #3b82f6;
+            --border-color: #374151;
+            --input-bg: #374151;
+            
+            /* Gradients */
+            --gradient-cinema: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            --gradient-gold: linear-gradient(135deg, #fbbf24, #f59e0b);
+            --gradient-card: linear-gradient(145deg, #2a2f3e, #323748);
+            
+            /* Shadows */
+            --shadow-glow: 0 0 30px rgba(251, 191, 36, 0.3);
+            --shadow-card: 0 10px 30px -5px rgba(26, 31, 46, 0.5);
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px;
+            min-height: 100vh;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: bold;
+            background: var(--gradient-gold);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: var(--text-muted);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--gradient-gold);
+            color: var(--bg-primary);
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--cinema-purple);
+            background: rgba(139, 92, 246, 0.1);
+        }
+
+        .btn-controls {
+            display: flex;
+            gap: 12px;
+        }
+
+        .grid {
+            display: grid;
+            gap: 24px;
+        }
+
+        .grid-main {
+            grid-template-columns: 1fr;
+        }
+
+        .grid-cols-2 {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .grid-cols-3 {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        @media (min-width: 1024px) {
+            .grid-main {
+                grid-template-columns: 320px 1fr;
+            }
+        }
+
+        .card {
+            background: var(--gradient-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: var(--shadow-card);
+        }
+
+        .card-header {
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .avatar-section {
+            text-align: center;
+        }
+
+        .avatar-container {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 16px;
+        }
+
+        .avatar-ring {
+            width: 128px;
+            height: 128px;
+            border-radius: 50%;
+            background: var(--gradient-cinema);
+            padding: 4px;
+        }
+
+        .avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .avatar-edit-btn {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--cinema-gold);
+            color: var(--bg-primary);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .username {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .member-since {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        .stats-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+        }
+
+        .stat-value {
+            font-weight: 600;
+        }
+
+        .stat-value.gold { color: var(--cinema-gold); }
+        .stat-value.purple { color: var(--cinema-purple); }
+        .stat-value.red { color: var(--cinema-red); }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-grid {
+            display: grid;
+            gap: 16px;
+        }
+
+        @media (min-width: 768px) {
+            .form-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .input, .textarea {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--input-bg);
+            color: var(--text-primary);
+            font-family: inherit;
+        }
+
+        .input:focus, .textarea:focus {
+            outline: none;
+            border-color: var(--cinema-gold);
+            box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.1);
+        }
+
+        .textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .display-text {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .display-text.muted {
+            color: var(--text-muted);
+            font-weight: normal;
+        }
+
+        .genres-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 8px;
+        }
+
+        .genre-btn {
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            background: transparent;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.875rem;
+        }
+
+        .genre-btn:hover {
+            border-color: var(--cinema-purple);
+        }
+
+        .genre-btn.active {
+            background: var(--gradient-cinema);
+            border-color: transparent;
+            color: white;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            border-radius: 16px;
+            background: var(--gradient-cinema);
+            color: white;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .badges-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .movies-grid {
+            display: grid;
+            gap: 8px;
+        }
+
+        @media (min-width: 768px) {
+            .movies-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .movie-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .star-icon {
+            color: var(--cinema-gold);
+            width: 16px;
+            height: 16px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .icon {
+            width: 20px;
+            height: 20px;
+        }
+
+        .icon-sm {
+            width: 16px;
+            height: 16px;
+        }
+
+        .color-gold { color: var(--cinema-gold); }
+        .color-purple { color: var(--cinema-purple); }
+        .color-red { color: var(--cinema-red); }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--gradient-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            color: var(--text-primary);
+            box-shadow: var(--shadow-card);
+            z-index: 1000;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .toast-description {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <h1>My Profile</h1>
+                <p>Manage your Movirra account</p>
+            </div>
+            <div class="btn-controls">
+                <button id="editBtn" class="btn btn-primary">
+                    <i data-lucide="edit-3" class="icon"></i>
+                    Edit Profile
+                </button>
+                <button id="saveBtn" class="btn btn-primary hidden">
+                    <i data-lucide="save" class="icon"></i>
+                    Save Changes
+                </button>
+                <button id="cancelBtn" class="btn btn-outline hidden">
+                    <i data-lucide="x" class="icon"></i>
+                    Cancel
+                </button>
+            </div>
+        </div>
+
+        <div class="grid grid-main">
+            <!-- Left Column -->
+            <div class="grid">
+                <!-- Avatar Card -->
+                <div class="card">
+                    <div class="avatar-section">
+                        <div class="avatar-container">
+                            <div class="avatar-ring">
+                                <img id="profileAvatar" src="{{user_profile.avatar.url}}" alt="Profile Avatar" class="avatar">
+                            </div>
+                            <button id="changeAvatarBtn" class="avatar-edit-btn hidden">
+                                <i data-lucide="camera" class="icon-sm"></i>
+                            </button>
+                        </div>
+                        <div>
+                            <h3 id="displayUsername" class="username">{{request.user.username}}</h3>
+                            <p class="member-since">Member since {{request.user.date_joined}}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title color-gold">
+                            <i data-lucide="star" class="icon"></i>
+                            Your Stats
+                        </h3>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-row">
+                            <span class="stat-label">Movies Watched</span>
+                            <span class="stat-value gold">347</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Favorite Genres</span>
+                            <span id="genreCount" class="stat-value purple">4</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Favorite Movies</span>
+                            <span class="stat-value red">4</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="grid">
+                <!-- Basic Information -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title color-gold">
+                            <i data-lucide="settings" class="icon"></i>
+                            Basic Information
+                        </h3>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="label">Username</label>
+                            <input id="usernameInput" type="text" class="input hidden" value="{{request.user.username}}">
+                            <p id="usernameDisplay" class="display-text">{{request.user.username}}</p>
+                        </div>
+                        <div class="form-group">
+                            <label class="label">Email</label>
+                            <input id="emailInput" type="email" class="input hidden" value="{{request.user.email}}">
+                            <p id="emailDisplay" class="display-text">{{request.user.email}}</p>
+                        </div>
+                    </div>
+                    {% if user_profile.bio == None %} 
+                    {% else %}
+                    <div class="form-group">
+                        <label class="label">Bio</label>
+                        <textarea id="bioInput" class="textarea hidden" placeholder="Tell us about your movie preferences...">{{user_profile.bio}}</textarea>
+                        <p id="bioDisplay" class="display-text muted">{{user_profile.bio}}</p>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Favorite Genres -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title color-purple">
+                            <i data-lucide="heart" class="icon"></i>
+                            Favorite Genres
+                        </h3>
+                    </div>
+                    <div id="genresEdit" class="genres-grid hidden"></div>
+                    <div id="genresDisplay" class="badges-container"></div>
+                </div>
+
+                <!-- Favorite Movies -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title color-red">
+                            <i data-lucide="clock" class="icon"></i>
+                            Favorite Movies
+                        </h3>
+                    </div>
+                    <div class="movies-grid">
+                        <div class="movie-item">
+                            <i data-lucide="star" class="star-icon"></i>
+                            <span>Inception</span>
+                        </div>
+                        <div class="movie-item">
+                            <i data-lucide="star" class="star-icon"></i>
+                            <span>The Dark Knight</span>
+                        </div>
+                        <div class="movie-item">
+                            <i data-lucide="star" class="star-icon"></i>
+                            <span>Interstellar</span>
+                        </div>
+                        <div class="movie-item">
+                            <i data-lucide="star" class="star-icon"></i>
+                            <span>Pulp Fiction</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+        <div class="toast-title">Profile Updated</div>
+        <div class="toast-description">Your profile has been successfully updated.</div>
+    </div>
+
+    <script>
+        // Profile data
+        let profile = {
+            username: "{{request.user.username}}",
+            email: "{{request.user.email}}m",
+            bio: "{{user_profile.bio}}",
+            favoriteGenres: ["Action", "Sci-Fi", "Thriller", "Drama"]
+        };
+
+        const allGenres = ["Action", "Adventure", "Animation", "Comedy", "Crime", "Documentary", "Drama", "Family", "Fantasy", "History", "Horror", "Music", "Mystery", "Romance", "Sci-Fi", "Thriller", "War", "Western"];
+
+        let isEditing = false;
+        let editedProfile = { ...profile };
+
+        // DOM elements
+        const editBtn = document.getElementById('editBtn');
+        const saveBtn = document.getElementById('saveBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const changeAvatarBtn = document.getElementById('changeAvatarBtn');
+        const toast = document.getElementById('toast');
+
+        // Input elements
+        const usernameInput = document.getElementById('usernameInput');
+        const emailInput = document.getElementById('emailInput');
+        const bioInput = document.getElementById('bioInput');
+
+        // Display elements
+        const displayUsername = document.getElementById('displayUsername');
+        const usernameDisplay = document.getElementById('usernameDisplay');
+        const emailDisplay = document.getElementById('emailDisplay');
+        const bioDisplay = document.getElementById('bioDisplay');
+        const genresEdit = document.getElementById('genresEdit');
+        const genresDisplay = document.getElementById('genresDisplay');
+        const genreCount = document.getElementById('genreCount');
+
+        // Initialize
+        function init() {
+            lucide.createIcons();
+            renderGenres();
+            updateGenreCount();
+        }
+
+        // Show toast notification
+        function showToast() {
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Toggle edit mode
+        function toggleEditMode() {
+            isEditing = !isEditing;
+            
+            if (isEditing) {
+                editBtn.classList.add('hidden');
+                saveBtn.classList.remove('hidden');
+                cancelBtn.classList.remove('hidden');
+                changeAvatarBtn.classList.remove('hidden');
+                
+                // Show inputs, hide displays
+                usernameInput.classList.remove('hidden');
+                emailInput.classList.remove('hidden');
+                bioInput.classList.remove('hidden');
+                genresEdit.classList.remove('hidden');
+                
+                usernameDisplay.classList.add('hidden');
+                emailDisplay.classList.add('hidden');
+                bioDisplay.classList.add('hidden');
+                genresDisplay.classList.add('hidden');
+                
+                // Set input values
+                usernameInput.value = editedProfile.username;
+                emailInput.value = editedProfile.email;
+                bioInput.value = editedProfile.bio;
+                
+            } else {
+                editBtn.classList.remove('hidden');
+                saveBtn.classList.add('hidden');
+                cancelBtn.classList.add('hidden');
+                changeAvatarBtn.classList.add('hidden');
+                
+                // Hide inputs, show displays
+                usernameInput.classList.add('hidden');
+                emailInput.classList.add('hidden');
+                bioInput.classList.add('hidden');
+                genresEdit.classList.add('hidden');
+                
+                usernameDisplay.classList.remove('hidden');
+                emailDisplay.classList.remove('hidden');
+                bioDisplay.classList.remove('hidden');
+                genresDisplay.classList.remove('hidden');
+            }
+        }
+
+        // Save changes
+        function saveChanges() {
+            editedProfile.username = usernameInput.value;
+            editedProfile.email = emailInput.value;
+            editedProfile.bio = bioInput.value;
+            
+            profile = { ...editedProfile };
+            
+            // Update displays
+            displayUsername.textContent = profile.username;
+            usernameDisplay.textContent = profile.username;
+            emailDisplay.textContent = profile.email;
+            bioDisplay.textContent = profile.bio;
+            
+            renderGenres();
+            updateGenreCount();
+            toggleEditMode();
+            showToast();
+        }
+
+        // Cancel changes
+        function cancelChanges() {
+            editedProfile = { ...profile };
+            toggleEditMode();
+        }
+
+        // Toggle genre selection
+        function toggleGenre(genre) {
+            const index = editedProfile.favoriteGenres.indexOf(genre);
+            if (index > -1) {
+                editedProfile.favoriteGenres.splice(index, 1);
+            } else {
+                editedProfile.favoriteGenres.push(genre);
+            }
+            renderGenreButtons();
+        }
+
+        // Render genre buttons for editing
+        function renderGenreButtons() {
+            genresEdit.innerHTML = '';
+            allGenres.forEach(genre => {
+                const button = document.createElement('button');
+                button.className = 'genre-btn';
+                button.textContent = genre;
+                button.onclick = () => toggleGenre(genre);
+                
+                if (editedProfile.favoriteGenres.includes(genre)) {
+                    button.classList.add('active');
+                }
+                
+                genresEdit.appendChild(button);
+            });
+        }
+
+        // Render genre badges for display
+        function renderGenreBadges() {
+            genresDisplay.innerHTML = '';
+            profile.favoriteGenres.forEach(genre => {
+                const badge = document.createElement('span');
+                badge.className = 'badge';
+                badge.textContent = genre;
+                genresDisplay.appendChild(badge);
+            });
+        }
+
+        // Render genres based on mode
+        function renderGenres() {
+            if (isEditing) {
+                renderGenreButtons();
+            } else {
+                renderGenreBadges();
+            }
+        }
+
+        // Update genre count
+        function updateGenreCount() {
+            genreCount.textContent = profile.favoriteGenres.length;
+        }
+
+        // Event listeners
+        editBtn.addEventListener('click', toggleEditMode);
+        saveBtn.addEventListener('click', saveChanges);
+        cancelBtn.addEventListener('click', cancelChanges);
+
+        changeAvatarBtn.addEventListener('click', () => {
+            alert('Avatar upload functionality would be implemented here!');
+        });
+
+        // Initialize the page
+        init();
+    </script>
+</body>
+</html>

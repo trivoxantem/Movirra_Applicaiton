@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Movirra</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#8B5CF6',
+                        'primary-dark': '#7C3AED',
+                        background: '#0F0F23',
+                        surface: '#1A1A2E',
+                        accent: '#16213E',
+                    },
+                    keyframes: {
+                        'fade-in': {
+                            '0%': {
+                                opacity: '0',
+                                transform: 'translateY(20px)'
+                            },
+                            '100%': {
+                                opacity: '1',
+                                transform: 'translateY(0)'
+                            }
+                        },
+                        'fade-in-up': {
+                            '0%': {
+                                opacity: '0',
+                                transform: 'translateY(30px)'
+                            },
+                            '100%': {
+                                opacity: '1',
+                                transform: 'translateY(0)'
+                            }
+                        },
+                        'scale-in': {
+                            '0%': {
+                                transform: 'scale(0.95)',
+                                opacity: '0'
+                            },
+                            '100%': {
+                                transform: 'scale(1)',
+                                opacity: '1'
+                            }
+                        },
+                        'slide-in-right': {
+                            '0%': { transform: 'translateX(100%)', opacity: '0' },
+                            '100%': { transform: 'translateX(0)', opacity: '1' }
+                        },
+                        'slide-in-left': {
+                            '0%': { transform: 'translateX(-100%)', opacity: '0' },
+                            '100%': { transform: 'translateX(0)', opacity: '1' }
+                        },
+                        'bounce-in': {
+                            '0%': { transform: 'scale(0.3)', opacity: '0' },
+                            '50%': { transform: 'scale(1.05)' },
+                            '70%': { transform: 'scale(0.9)' },
+                            '100%': { transform: 'scale(1)', opacity: '1' }
+                        },
+                        'glow-pulse': {
+                            '0%, 100%': { boxShadow: '0 0 20px rgba(139, 92, 246, 0.3)' },
+                            '50%': { boxShadow: '0 0 40px rgba(139, 92, 246, 0.6)' }
+                        },
+                        'float': {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-20px)' }
+                        },
+                        'rotate-slow': {
+                            '0%': { transform: 'rotate(0deg)' },
+                            '100%': { transform: 'rotate(360deg)' }
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fade-in 0.6s ease-out',
+                        'fade-in-up': 'fade-in-up 0.8s ease-out',
+                        'scale-in': 'scale-in 0.4s ease-out',
+                        'slide-in-right': 'slide-in-right 0.6s ease-out',
+                        'slide-in-left': 'slide-in-left 0.6s ease-out',
+                        'bounce-in': 'bounce-in 0.8s ease-out',
+                        'glow-pulse': 'glow-pulse 2s ease-in-out infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                        'rotate-slow': 'rotate-slow 20s linear infinite',
+                        'delayed-fade-in': 'fade-in 0.6s ease-out 0.2s both',
+                        'delayed-fade-in-2': 'fade-in 0.6s ease-out 0.4s both',
+                        'delayed-fade-in-3': 'fade-in 0.6s ease-out 0.6s both',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #0F0F23 0%, #1A1A2E 50%, #16213E 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .input-glow:focus {
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+            border-color: #8B5CF6;
+            transform: translateY(-2px);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #8B5CF6, #7C3AED);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(139, 92, 246, 0.4);
+        }
+        
+        .btn-primary:active {
+            transform: translateY(-1px);
+        }
+        
+        .error-message {
+            color: #EF4444;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+        
+        .error-message.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .success-message {
+            color: #10B981;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+        
+        .success-message.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .input-container {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .input-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.1), transparent);
+            transition: left 0.6s ease;
+            border-radius: 0.5rem;
+        }
+        
+        .input-container:hover::before {
+            left: 100%;
+        }
+        
+        .logo-animation {
+            animation: bounce-in 1s ease-out;
+        }
+        
+        .social-btn {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .social-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.5s;
+        }
+        
+        .social-btn:hover::before {
+            left: 100%;
+        }
+        
+        .social-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+        
+        .checkbox-container {
+            position: relative;
+        }
+        
+        .checkbox-container input[type="checkbox"] {
+            appearance: none;
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 0.25rem;
+            background: transparent;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .checkbox-container input[type="checkbox"]:checked {
+            background: linear-gradient(135deg, #8B5CF6, #7C3AED);
+            border-color: #8B5CF6;
+            transform: scale(1.1);
+        }
+        
+        .checkbox-container input[type="checkbox"]:checked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+        
+        .progress-indicator {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #8B5CF6, #7C3AED);
+            transition: width 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .particle {
+            position: absolute;
+            background: rgba(139, 92, 246, 0.6);
+            border-radius: 50%;
+            animation: float 4s ease-in-out infinite;
+        }
+        
+        .particle:nth-child(odd) {
+            animation-delay: -2s;
+        }
+        
+        @keyframes sparkle {
+            0%, 100% { opacity: 0; transform: scale(0); }
+            50% { opacity: 1; transform: scale(1); }
+        }
+        
+        .sparkle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #8B5CF6;
+            border-radius: 50%;
+            animation: sparkle 2s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="text-white font-sans">
+    <!-- Progress Indicator -->
+    <div id="progressBar" class="progress-indicator w-0"></div>
+
+    <!-- Background decorative elements -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-1/4 left-1/4 w-64 h-64 bg-primary opacity-10 rounded-full blur-3xl animate-float"></div>
+        <div class="absolute bottom-1/4 right-1/4 w-80 h-80 bg-purple-400 opacity-10 rounded-full blur-3xl animate-float" style="animation-delay: -3s;"></div>
+        <div class="absolute top-3/4 left-1/2 w-96 h-96 bg-blue-400 opacity-5 rounded-full blur-3xl animate-float" style="animation-delay: -6s;"></div>
+        
+        <!-- Floating particles -->
+        <div class="particle w-2 h-2 top-1/4 right-1/3" style="animation-delay: -1s;"></div>
+        <div class="particle w-1 h-1 top-3/4 left-1/4" style="animation-delay: -3s;"></div>
+        <div class="particle w-3 h-3 bottom-1/3 right-1/4" style="animation-delay: -5s;"></div>
+        
+        <!-- Sparkles -->
+        <div class="sparkle top-1/6 left-3/4" style="animation-delay: -1s;"></div>
+        <div class="sparkle bottom-1/6 left-1/6" style="animation-delay: -2s;"></div>
+        <div class="sparkle top-2/3 right-1/5" style="animation-delay: -3s;"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="relative z-10 p-6 animate-slide-in-left">
+        <div class="container mx-auto">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-2 logo-animation">
+                    <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center animate-glow-pulse">
+                        <span class="text-white font-bold text-lg">M</span>
+                    </div>
+                    <span class="text-2xl font-bold">Movirra</span>
+                </div>
+                <nav class="hidden md:flex space-x-8 animate-slide-in-right">
+                    <a href="movirra-homepage.html" class="hover:text-primary transition-all duration-300 transform hover:scale-110 hover:underline">Home</a>
+                    <a href="movirra-movies.html" class="hover:text-primary transition-all duration-300 transform hover:scale-110 hover:underline">Movies</a>
+                    <a href="#" class="hover:text-primary transition-all duration-300 transform hover:scale-110 hover:underline">TV Shows</a>
+                    <a href="#" class="hover:text-primary transition-all duration-300 transform hover:scale-110 hover:underline">Login</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="relative z-10 flex items-center justify-center min-h-screen px-4 py-12">
+        <div class="w-full max-w-md">
+            <!-- Signup Card -->
+            <div class="glass-effect rounded-2xl p-8 shadow-2xl animate-scale-in">
+                <div class="text-center mb-8 animate-fade-in-up">
+                    <h1 class="text-3xl font-bold mb-2 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">Join Movirra</h1>
+                    <p class="text-gray-300">Create your account to start watching</p>
+                </div>
+
+                <!-- Signup Form -->
+                <form id="signupForm" class="space-y-6" method="POST">
+                    {% csrf_token %}
+                    <!-- Full Name -->
+                    <div class="animate-delayed-fade-in input-container">
+                        <label for="fullName" class="block text-sm font-medium mb-2">Full Name</label>
+                        <input 
+                            type="text" 
+                            id="fullName" 
+                            name="name"
+                            class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none input-glow transition-all duration-300"
+                            placeholder="Enter your full name"
+                            required
+                        >
+                        <div id="fullNameError" class="error-message"></div>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="animate-delayed-fade-in-2 input-container">
+                        <label for="email" class="block text-sm font-medium mb-2">Email Address</label>
+                        <input 
+                            type="email" 
+                            id="email" 
+                            name="email"
+                            class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none input-glow transition-all duration-300"
+                            placeholder="Enter your email"
+                            required
+                        >
+                        <div id="emailError" class="error-message"></div>
+                    </div>
+
+                    <!-- Password -->
+                    <div class="animate-delayed-fade-in-3 input-container">
+                        <label for="password" class="block text-sm font-medium mb-2">Password</label>
+                        <div class="relative">
+                            <input 
+                                type="password" 
+                                id="password" 
+                                name="password"
+                                class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none input-glow transition-all duration-300"
+                                placeholder="Create a password"
+                                required
+                            >
+                            <button 
+                                type="button" 
+                                id="togglePassword"
+                                class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-all duration-300 hover:scale-110"
+                            >
+                                <svg id="eyeIcon" width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+                                    <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div id="passwordError" class="error-message"></div>
+                        <div class="mt-2">
+                            <div class="text-xs text-gray-400 space-y-1">
+                                <div id="lengthCheck" class="flex items-center space-x-2 transition-all duration-300">
+                                    <span class="w-2 h-2 rounded-full bg-gray-500 transition-all duration-300"></span>
+                                    <span>At least 8 characters</span>
+                                </div>
+                                <div id="upperCheck" class="flex items-center space-x-2 transition-all duration-300">
+                                    <span class="w-2 h-2 rounded-full bg-gray-500 transition-all duration-300"></span>
+                                    <span>One uppercase letter</span>
+                                </div>
+                                <div id="numberCheck" class="flex items-center space-x-2 transition-all duration-300">
+                                    <span class="w-2 h-2 rounded-full bg-gray-500 transition-all duration-300"></span>
+                                    <span>One number</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Confirm Password -->
+                    <div class="animate-delayed-fade-in input-container" style="animation-delay: 0.8s;">
+                        <label for="confirmPassword" class="block text-sm font-medium mb-2">Confirm Password</label>
+                        <input 
+                            type="password" 
+                            id="confirmPassword" 
+                            name="password2"
+                            class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg focus:outline-none input-glow transition-all duration-300"
+                            placeholder="Confirm your password"
+                            required
+                        >
+                        <div id="confirmPasswordError" class="error-message"></div>
+                    </div>
+
+                    <!-- Terms and Conditions -->
+                    <div class="flex items-start space-x-3 animate-delayed-fade-in checkbox-container" style="animation-delay: 1s;">
+                        <input 
+                            type="checkbox" 
+                            id="terms" 
+                            name="terms"
+                            required
+                        >
+                        <label for="terms" class="text-sm text-gray-300">
+                            I agree to the <a href="#" class="text-primary hover:underline transition-all duration-300 hover:text-purple-300">Terms of Service</a> and 
+                            <a href="#" class="text-primary hover:underline transition-all duration-300 hover:text-purple-300">Privacy Policy</a>
+                        </label>
+                    </div>
+                    <div id="termsError" class="error-message"></div>
+
+                    <!-- Submit Button -->
+                    <button 
+                        type="submit" 
+                        id="submitBtn"
+                        class="w-full btn-primary text-white font-semibold py-3 px-6 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed animate-delayed-fade-in relative z-10"
+                        style="animation-delay: 1.2s;"
+                    >
+                        <span id="submitText" class="relative z-10">Create Account</span>
+                        <span id="loadingSpinner" class="hidden relative z-10">
+                            <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Creating Account...
+                        </span>
+                    </button>
+                </form>
+
+                <!-- Divider -->
+                <div class="my-6 flex items-center animate-delayed-fade-in" style="animation-delay: 1.4s;">
+                    <div class="flex-1 border-t border-white/20"></div>
+                    <span class="px-4 text-sm text-gray-400">or</span>
+                    <div class="flex-1 border-t border-white/20"></div>
+                </div>
+
+                <!-- Social Login -->
+                <div class="space-y-3 animate-delayed-fade-in" style="animation-delay: 1.6s;">
+                    <button class="w-full flex items-center justify-center space-x-3 py-3 px-4 bg-white/10 border border-white/20 rounded-lg social-btn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                        </svg>
+                        <span>Continue with Google</span>
+                    </button>
+                    
+                    <button class="w-full flex items-center justify-center space-x-3 py-3 px-4 bg-white/10 border border-white/20 rounded-lg social-btn">
+                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                        </svg>
+                        <span>Continue with Facebook</span>
+                    </button>
+                </div>
+
+                <!-- Login Link -->
+                <div class="mt-6 text-center animate-delayed-fade-in" style="animation-delay: 1.8s;">
+                    <p class="text-gray-300">
+                        Already have an account? 
+                        <a href="{% url 'login' %}" class="text-primary hover:underline font-medium transition-all duration-300 hover:text-purple-300">Sign in</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Progress bar animation
+function updateProgress() {
+    const form = document.getElementById('signupForm');
+    const inputs = form.querySelectorAll('input[required]');
+    const progressBar = document.getElementById('progressBar');
+    
+    let filled = 0;
+    inputs.forEach(input => {
+        if (input.type === 'checkbox') {
+            if (input.checked) filled++;
+        } else {
+            if (input.value.trim() !== '') filled++;
+        }
+    });
+    
+    const progress = (filled / inputs.length) * 100;
+    progressBar.style.width = progress + '%';
+}
+
+// Password strength indicators
+const form = document.getElementById('signupForm');
+const passwordInput = document.getElementById('password');
+const lengthCheck = document.getElementById('lengthCheck');
+const upperCheck = document.getElementById('upperCheck');
+const numberCheck = document.getElementById('numberCheck');
+
+// Add progress tracking to all inputs
+form.querySelectorAll('input').forEach(input => {
+    input.addEventListener('input', updateProgress);
+    input.addEventListener('change', updateProgress);
+});
+
+// Real-time password validation with animations
+passwordInput.addEventListener('input', function() {
+    const password = this.value;
+    
+    // Length check
+    const lengthSpan = lengthCheck.querySelector('span');
+    if (password.length >= 8) {
+        lengthSpan.className = 'w-2 h-2 rounded-full bg-green-500 animate-bounce-in transition-all duration-300';
+        lengthCheck.classList.add('text-green-400');
+    } else {
+        lengthSpan.className = 'w-2 h-2 rounded-full bg-gray-500 transition-all duration-300';
+        lengthCheck.classList.remove('text-green-400');
+    }
+    
+    // Uppercase check
+    const upperSpan = upperCheck.querySelector('span');
+    if (/[A-Z]/.test(password)) {
+        upperSpan.className = 'w-2 h-2 rounded-full bg-green-500 animate-bounce-in transition-all duration-300';
+        upperCheck.classList.add('text-green-400');
+    } else {
+        upperSpan.className = 'w-2 h-2 rounded-full bg-gray-500 transition-all duration-300';
+        upperCheck.classList.remove('text-green-400');
+    }
+    
+    // Number check
+    const numberSpan = numberCheck.querySelector('span');
+    if (/\d/.test(password)) {
+        numberSpan.className = 'w-2 h-2 rounded-full bg-green-500 animate-bounce-in transition-all duration-300';
+        numberCheck.classList.add('text-green-400');
+    } else {
+        numberSpan.className = 'w-2 h-2 rounded-full bg-gray-500 transition-all duration-300';
+        numberCheck.classList.remove('text-green-400');
+    }
+});
+
+document.getElementById('togglePassword').addEventListener('click', function() {
+    const passwordInput = document.getElementById('password');
+    const eyeIcon = document.getElementById('eyeIcon');
+    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+    passwordInput.setAttribute('type', type);
+
+    // Optional: Change icon style
+    if (type === 'text') {
+        eyeIcon.innerHTML = `
+            <path d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L8.464 8.464M9.878 9.878l-1.415-1.414m4.243 4.243l1.414 1.414M14.121 14.121L18.535 18.535"/>
+        `;
+    } else {
+        eyeIcon.innerHTML = `
+            <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+            <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
+        `;
+    }
+});
+
+// Initialize progress bar on page load
+updateProgress();
+    </script>
+</body>
+</html>

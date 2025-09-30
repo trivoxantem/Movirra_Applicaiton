@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movirra - Cinematic Streaming Platform</title>
+    <meta name="description" content="Stream the latest movies and series on Movirra - Your premium cinematic experience">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    
+    <style>
+        /* Custom CSS Variables for Dark Theme */
+        :root {
+            --background: 222.2 84% 4.9%;
+            --foreground: 210 40% 98%;
+            --card: 222.2 84% 4.9%;
+            --card-foreground: 210 40% 98%;
+            --primary: 210 40% 98%;
+            --primary-foreground: 222.2 47.4% 11.2%;
+            --secondary: 217.2 32.6% 17.5%;
+            --secondary-foreground: 210 40% 98%;
+            --muted: 217.2 32.6% 17.5%;
+            --muted-foreground: 215 20.2% 65.1%;
+            --accent: 217.2 32.6% 17.5%;
+            --accent-foreground: 210 40% 98%;
+            --border: 217.2 32.6% 17.5%;
+            --input: 217.2 32.6% 17.5%;
+        }
+
+        body {
+            background-color: hsl(var(--background));
+            color: hsl(var(--foreground));
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        .bg-background { background-color: hsl(var(--background)); }
+        .bg-secondary { background-color: hsl(var(--secondary)); }
+        .bg-primary { background-color: hsl(var(--primary)); }
+        .text-foreground { color: hsl(var(--foreground)); }
+        .text-muted-foreground { color: hsl(var(--muted-foreground)); }
+        .text-primary { color: hsl(var(--primary)); }
+        .text-secondary-foreground { color: hsl(var(--secondary-foreground)); }
+        .text-primary-foreground { color: hsl(var(--primary-foreground)); }
+        .border-border { border-color: hsl(var(--border)); }
+
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        /* Custom Scrollbar */
+.scrollbar-show::-webkit-scrollbar {
+  height: 8px; /* horizontal scrollbar height */
+}
+
+.scrollbar-show::-webkit-scrollbar-track {
+  background: transparent; /* or use #1f1f1f for dark theme */
+}
+
+.scrollbar-show::-webkit-scrollbar-thumb {
+  background: #6b7280; /* gray-500 */
+  border-radius: 9999px; /* fully rounded */
+}
+
+.scrollbar-show::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af; /* gray-400 on hover */
+}
+
+        .movie-card {
+            transition: all 0.3s ease;
+        }
+        .movie-card:hover {
+            transform: scale(1.05);
+            z-index: 10;
+        }
+
+        .genre-card {
+            transition: all 0.3s ease;
+        }
+        .genre-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .nav-link {
+            transition: color 0.3s ease;
+        }
+        .nav-link:hover {
+            color: hsl(var(--primary));
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, hsl(var(--primary)), #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-gradient {
+            background: linear-gradient(to right, rgba(0,0,0,0.8), rgba(0,0,0,0.4), transparent);
+        }
+
+        .card-overlay {
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent, transparent);
+        }
+
+        .btn-primary {
+            background-color: hsl(var(--primary));
+            color: hsl(var(--primary-foreground));
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .btn-primary:hover {
+            background-color: hsl(var(--primary) / 0.9);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: white;
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .btn-outline:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
+
+        .input-search {
+            background-color: hsl(var(--secondary));
+            border: 1px solid hsl(var(--border));
+            border-radius: 0.5rem;
+            padding: 0.5rem 0.75rem 0.5rem 2.5rem;
+            color: hsl(var(--foreground));
+            width: 16rem;
+        }
+        .input-search::placeholder {
+            color: hsl(var(--muted-foreground));
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 3rem;
+            }
+            .nav-links {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo -->
+                <div class="flex items-center">
+                    <a href="{% url 'home' %}"><h1 class="text-2xl font-bold gradient-text">Movirra</h1></a>
+                </div>
+
+                <!-- Navigation Links -->
+                <div id="nav-links" class="nav-links hidden md:flex items-center space-x-8">
+                    <a href="{% url 'home' %}" class="nav-link text-foreground">Home</a>
+                    <a href="{% url 'movies' %}" class="nav-link text-muted-foreground">Movies</a>
+                    <a href="#" class="nav-link text-muted-foreground">Series</a>
+
+                </div>
+
+                <!-- Search and Profile -->
+                <div class="flex items-center space-x-4">
+                    {% if request.user.is_authenticated %}
+                    <a href="{% url 'profile' pk=request.user.profile.id %}">
+                    <button class="p-2 hover:bg-secondary rounded-lg">
+                        <i data-lucide="user" class="w-5 h-5"></i>
+                    </button>
+                    </a>
+                    <button id="menu-toggle" class="p-2 hover:bg-secondary rounded-lg md:hidden">
+                        <i data-lucide="menu" class="w-5 h-5"></i>
+                    </button>
+                    
+                        <a href="{% url 'logout' %}">Logout @{{ request.user.username }}</a>
+                    {% else %}
+                        <a href="{% url 'login' %}">Login</a>
+                    {% endif %}
+
+
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+<section class="relative h-screen flex items-center justify-center overflow-hidden">
+    {# --- Django trailer video(s) as background --- #}
+    {% for trailer in trailers %}
+      <video
+        class="absolute inset-0 w-full h-full object-cover"
+        autoplay
+        muted
+        loop
+        playsinline
+      >
+        <source src="{{ trailer.trailers.url }}" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+    {% endfor %}
+    <div class="absolute inset-0 hero-gradient"></div>
+    
+    <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-2xl">
+            {% for trailer in trailers %}
+            <h1 class="hero-title text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                {{trailer.title}}
+            </h1>
+            
+            <p class="text-lg md:text-xl text-gray-300 mb-6 leading-relaxed">
+                {{trailer.description}}
+            </p>
+            
+            
+            <div class="flex items-center space-x-4 mb-8">
+                <div class="flex items-center space-x-2">
+                    <i data-lucide="star" class="w-5 h-5 text-yellow-400 fill-yellow-400"></i>
+                    <span class="text-yellow-400 font-semibold">{{trailer.rating}}</span>
+                </div>
+                <span class="text-gray-400">{{trailer.release_date}}</span>
+            </div>
+            {% endfor %}
+
+            <div class="flex flex-wrap gap-2 mb-8">
+                <span class="px-3 py-1 bg-secondary/80 text-secondary-foreground rounded-full text-sm">Sci-Fi</span>
+                <span class="px-3 py-1 bg-secondary/80 text-secondary-foreground rounded-full text-sm">Thriller</span>
+                <span class="px-3 py-1 bg-secondary/80 text-secondary-foreground rounded-full text-sm">Action</span>
+            </div>
+
+            <div class="flex space-x-4">
+                <button class="btn-primary">
+                    <i data-lucide="play" class="w-5 h-5"></i>
+                    Play Now
+                </button>
+
+                <a href="{% url 'movies' %}">
+                <button class="btn-primary flex items-center space-x-2" style="background-color: rgba(255, 255, 255, 0.2);">
+                    <i data-lucide="clapperboard" class="w-5 h-5"></i>
+                    <span>Movies</span>
+                </button>
+                </a>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+    <!-- Content Sections -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <!-- Search/Results Heading -->
+    {% if query %}
+      <h3 class="text-xl sm:text-2xl font-semibold mb-2">
+        Search Results for: <span class="text-red-400">"{{ query }}"</span>
+      </h3>
+      {% if not latest_movies and not tv_series %}
+        <p class="text-gray-400 mb-6">No results found.</p>
+      {% endif %}
+    {% else %}
+
+    {% endif %}
+
+</main>
+        <!-- Trending Now -->
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold text-foreground mb-4">Trending Now</h2>
+            <div class="flex space-x-4 overflow-x-auto pb-4 scrollbar-show">
+                {% for movie in trending_movies %}
+                <div class="movie-card group relative flex-shrink-0 w-48 h-72 rounded-lg overflow-hidden cursor-pointer">
+                    <a href="">
+                        <img 
+                            src="{{ movie.poster_image.url }}" 
+                            alt="{{ movie.title }}"
+                            class="w-full h-full object-cover"
+                        />
+                        <div class="absolute inset-0 card-overlay opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <div class="absolute bottom-0 left-0 right-0 p-4">
+                                <h3 class="text-white font-semibold text-sm mb-1">{{ movie.title }}</h3>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-1">
+                                        <i data-lucide="star" class="w-3 h-3 text-yellow-400 fill-yellow-400"></i>
+                                        <span class="text-yellow-400 text-xs">5</span>
+                                    </div>
+                                    <span class="text-gray-300 text-xs">{{ movie.release_date }}</span>
+                                </div>
+                                <a href="{% url 'watch_video' video_id=movie.id %}" class="mt-2 w-full bg-primary hover:bg-primary/90 text-primary-foreground py-1 px-3 rounded text-sm flex items-center justify-center gap-1 btn-primary">
+                                    <i data-lucide="play" class="w-3 h-3"></i>
+                                    Play
+                                </a>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                {% empty %}
+                <p class="text-gray-300">No movies available right now.</p>
+                {% endfor %}
+            </div>
+        </section>
+
+        
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-secondary/20 border-t border-border">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-lg font-semibold text-foreground mb-4">Company</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="nav-link text-muted-foreground">About</a></li>
+                        <li><a href="#" class="nav-link text-muted-foreground">Careers</a></li>
+                        <li><a href="#" class="nav-link text-muted-foreground">Press</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-foreground mb-4">Support</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="nav-link text-muted-foreground">Help Center</a></li>
+                        <li><a href="#" class="nav-link text-muted-foreground">Contact</a></li>
+                        <li><a href="#" class="nav-link text-muted-foreground">Device Support</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-foreground mb-4">Legal</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="nav-link text-muted-foreground">Terms of Service</a></li>
+                        <li><a href="#" class="nav-link text-muted-foreground">Privacy Policy</a></li>
+                        <li><a href="#" class="nav-link text-muted-foreground">Cookie Preferences</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-foreground mb-4">Connect</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="nav-link text-muted-foreground">Twitter</a></li>
+                        <li><a href="#" class="nav-link text-muted-foreground">Facebook</a></li>
+                        <li><a href="#" class="nav-link text-muted-foreground">Instagram</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-border mt-8 pt-8 text-center">
+                <p class="text-muted-foreground">© 2025 Movirra. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+
+        const genres = [
+            { name: "Action", count: 1250, color: "from-red-600 to-red-400" },
+            { name: "Sci-Fi", count: 890, color: "from-purple-600 to-purple-400" },
+            { name: "Thriller", count: 720, color: "from-blue-600 to-blue-400" },
+            { name: "Horror", count: 560, color: "from-gray-600 to-gray-400" },
+            { name: "Comedy", count: 980, color: "from-yellow-600 to-yellow-400" },
+            { name: "Drama", count: 1100, color: "from-green-600 to-green-400" },
+        ];
+
+        // Create movie card HTML
+        function createMovieCard(movie) {
+            return `
+                <div class="movie-card group relative flex-shrink-0 w-48 h-72 rounded-lg overflow-hidden cursor-pointer">
+                    <img 
+                        src="${movie.image}" 
+                        alt="${movie.title}"
+                        class="w-full h-full object-cover"
+                    />
+                    <div class="absolute inset-0 card-overlay opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <div class="absolute bottom-0 left-0 right-0 p-4">
+                            <h3 class="text-white font-semibold text-sm mb-1">${movie.title}</h3>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-1">
+                                    <i data-lucide="star" class="w-3 h-3 text-yellow-400 fill-yellow-400"></i>
+                                    <span class="text-yellow-400 text-xs">${movie.rating}</span>
+                                </div>
+                                <span class="text-gray-300 text-xs">${movie.year}</span>
+                            </div>
+                            <button class="mt-2 w-full bg-primary hover:bg-primary/90 text-primary-foreground py-1 px-3 rounded text-sm flex items-center justify-center gap-1">
+                                <i data-lucide="play" class="w-3 h-3"></i>
+                                Play
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Create genre card HTML
+        function createGenreCard(genre) {
+            return `
+                <div class="genre-card relative p-6 rounded-lg bg-gradient-to-br ${genre.color} cursor-pointer">
+                    <h3 class="text-white font-semibold text-lg mb-2">${genre.name}</h3>
+                    <p class="text-white/80 text-sm">${genre.count} titles</p>
+                    <div class="absolute inset-0 bg-black/20 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                </div>
+            `;
+        }
+
+
+        // Populate genres grid
+        function populateGenres() {
+            const genresGrid = document.getElementById('genres-grid');
+            genresGrid.innerHTML = genres.map(createGenreCard).join('');
+        }
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            console.log('Searching for:', searchTerm);
+            // Add search functionality here if needed
+        });
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            populateCarousels();
+            populateGenres();
+        });
+    </script>
+</body>
+</html>

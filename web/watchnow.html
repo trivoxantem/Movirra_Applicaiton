@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movirra - Movie Player</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#e50914',
+                        secondary: '#564d4d',
+                        dark: '#141414',
+                        darker: '#000000'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background: linear-gradient(180deg, #000000 0%, #141414 100%);
+            font-family: 'Arial', sans-serif;
+        }
+        
+        
+        .video-controls {
+            background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.8) 100%);
+        }
+        
+        .progress-bar {
+            background: linear-gradient(90deg, #e50914 0%, #ff0000 100%);
+        }
+        
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .movie-card {
+            transition: all 0.3s ease;
+            background: linear-gradient(145deg, #1a1a1a, #2a2a2a);
+        }
+        
+        .movie-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(229, 9, 20, 0.3);
+        }
+        
+        .play-button {
+            background: radial-gradient(circle, #e50914 0%, #b8070f 100%);
+        }
+        
+        .control-button {
+            transition: all 0.2s ease;
+        }
+        
+        .control-button:hover {
+            color: #e50914;
+            transform: scale(1.1);
+        }
+        
+        .video-container {
+            position: relative;
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.3);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .video-container:hover .video-overlay {
+            opacity: 1;
+        }
+        
+        .video-container:hover .video-controls {
+            opacity: 1;
+        }
+        
+        .progress-container {
+            position: relative;
+            height: 4px;
+            background: rgba(255,255,255,0.3);
+            cursor: pointer;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: #e50914;
+            transition: width 0.1s ease;
+        }
+        
+        .progress-handle {
+            position: absolute;
+            top: -6px;
+            width: 16px;
+            height: 16px;
+            background: #e50914;
+            border-radius: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        
+        .progress-container:hover .progress-handle {
+            opacity: 1;
+        }
+        
+    </style>
+</head>
+<body class="bg-darker text-white min-h-screen">
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 z-50 bg-gradient-to-b from-black/80 to-transparent p-4">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-8">
+                <div class="flex items-center">
+                    <h1 class="text-2xl font-bold gradient-text">Movirra</h1>
+                </div>
+                <nav class="hidden md:flex space-x-6">
+                    <a href="{% url 'home' %}" class="hover:text-primary transition-colors">Home</a>
+                    <a href="{% url 'movies' %}" class="hover:text-primary transition-colors">Movies</a>
+                </nav>
+            </div>
+            <div class="flex items-center space-x-4">
+                {% if user.is_authenticated and user.profile.avatar %}
+                    <img src="{{ user.profile.avatar.url }}" alt="Profile" class="w-8 h-8 rounded-full object-cover cursor-pointer" />
+                {% else %}
+                    <img src="{{user.profile.avatar.url}}" alt="Profile" class="w-8 h-8 rounded-full object-cover cursor-pointer" />
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="pt-20">
+        <!-- Video Player Section -->
+        <div class="max-w-7xl mx-auto px-4 mb-8">
+            <div class="video-container aspect-video relative">
+                <video 
+                    id="mainVideo"
+                    class="w-full h-full object-cover"
+                    poster="https://images.unsplash.com/photo-1489599510906-c2c7b7c72dbb?w=1920&h=1080&fit=crop"
+                >
+                    <source src="{{video.video_upload.url}}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+                
+                <!-- Video Overlay -->
+                <div class="video-overlay"></div>
+                
+                <!-- Play Button Overlay -->
+                <div id="playOverlay" class="absolute inset-0 flex items-center justify-center">
+                    <button id="playButton" class="play-button w-20 h-20 rounded-full flex items-center justify-center shadow-lg">
+                        <svg class="w-8 h-8 ml-1" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Video Controls -->
+                <div class="video-controls absolute bottom-0 left-0 right-0 p-6 opacity-0 transition-opacity duration-300">
+                    <!-- Progress Bar -->
+                    <div class="progress-container mb-4">
+                        <div id="progressFill" class="progress-fill" style="width: 30%"></div>
+                        <div id="progressHandle" class="progress-handle" style="left: 30%"></div>
+                    </div>
+                    
+                    <!-- Control Buttons -->
+<div class="flex items-center justify-between">
+    <div class="flex items-center space-x-4">
+        <!-- Play/Pause -->
+        <button id="playPauseBtn" class="control-button" title="Play/Pause">
+            <svg id="playPauseIcon" class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                <path id="playPausePath" fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path>
+            </svg>
+        </button>
+        <!-- Stop -->
+        <button id="stopBtn" class="control-button" title="Stop">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                <rect x="6" y="6" width="8" height="8" rx="2"></rect>
+            </svg>
+        </button>
+        <!-- Rewind 10s -->
+        <button id="rewindBtn" class="control-button" title="Rewind 10s">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M7 10l5-5v10l-5-5z"></path>
+            </svg>
+        </button>
+        <!-- Forward 10s -->
+        <button id="forwardBtn" class="control-button" title="Forward 10s">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M13 10l-5 5V5l5 5z"></path>
+            </svg>
+        </button>
+        <!-- Time Display -->
+        <span id="timeDisplay" class="text-sm">0:00 / 0:00</span>
+    </div>
+    <div class="flex items-center space-x-4">
+        <!-- Mute/Unmute -->
+        <button id="muteBtn" class="control-button" title="Mute/Unmute">
+            <svg id="muteIcon" class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.617.824L4.75 13.5H3a1 1 0 01-1-1v-5a1 1 0 011-1h1.75l3.633-3.324a1 1 0 011.617.824z"></path>
+            </svg>
+        </button>
+        <!-- Fullscreen -->
+        <button id="fullscreenBtn" class="control-button" title="Fullscreen">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h4a1 1 0 010 2H6.414l2.293 2.293a1 1 0 01-1.414 1.414L5 6.414V8a1 1 0 01-2 0V4zm9 1a1 1 0 010-2h4a1 1 0 011 1v4a1 1 0 01-2 0V6.414l-2.293 2.293a1 1 0 11-1.414-1.414L13.586 5H12z" clip-rule="evenodd"></path>
+            </svg>
+        </button>
+    </div>
+</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Movie Info Section -->
+        <div class="max-w-7xl mx-auto px-4 mb-12">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Main Info -->
+                <div class="lg:col-span-2">
+                    <h1 class="text-4xl font-bold mb-4">{{video.title}}</h1>
+                    <div class="flex items-center space-x-4 mb-6">
+                        <span class="bg-primary px-3 py-1 rounded text-sm font-semibold">{{video.release_date}}</span>
+                        <span class="text-gray-300">PG-13</span>
+                        <span class="text-gray-300">2h 28m</span>
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 text-yellow-400 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                            </svg>
+                            <span class="font-semibold">8.8</span>
+                        </div>
+                    </div>
+                    
+                    <p class="text-gray-300 text-lg leading-relaxed mb-6">
+                        {{video.description}}
+                    </p>
+                    
+                    <div class="flex flex-wrap gap-2 mb-6">
+                        <span class="bg-gray-800 px-3 py-1 rounded-full text-sm">Sci-Fi</span>
+                        <span class="bg-gray-800 px-3 py-1 rounded-full text-sm">Action</span>
+                        <span class="bg-gray-800 px-3 py-1 rounded-full text-sm">Thriller</span>
+                    </div>
+                    
+                </div>
+                
+                <!-- Cast & Crew -->
+                <div>
+                    <h3 class="text-xl font-semibold mb-4">Cast & Crew</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-12 h-12 bg-gray-700 rounded-full"></div>
+                            <div>
+                                <p class="font-semibold">Leonardo DiCaprio</p>
+                                <p class="text-gray-400 text-sm">Dom Cobb</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <div class="w-12 h-12 bg-gray-700 rounded-full"></div>
+                            <div>
+                                <p class="font-semibold">Marion Cotillard</p>
+                                <p class="text-gray-400 text-sm">Mal</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <div class="w-12 h-12 bg-gray-700 rounded-full"></div>
+                            <div>
+                                <p class="font-semibold">Tom Hardy</p>
+                                <p class="text-gray-400 text-sm">Eames</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <div class="w-12 h-12 bg-gray-700 rounded-full"></div>
+                            <div>
+                                <p class="font-semibold">Christopher Nolan</p>
+                                <p class="text-gray-400 text-sm">Director</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Comments Section -->
+        {% comment %} <div class="max-w-7xl mx-auto px-4 mb-12">
+            <h2 class="text-2xl font-bold mb-6">Comments</h2>
+            <div class="bg-gray-900 rounded-lg p-6">
+                <div class="flex space-x-4 mb-6">
+                    <div class="w-10 h-10 bg-primary rounded-full flex-shrink-0"></div>
+                    <div class="flex-1">
+                        <textarea 
+                            placeholder="Add a comment..." 
+                            class="w-full bg-gray-800 rounded-lg p-3 text-white placeholder-gray-400 border-none outline-none resize-none"
+                            rows="3"
+                        ></textarea>
+                        <div class="flex justify-end mt-2">
+                            <button class="bg-primary hover:bg-red-700 px-4 py-2 rounded-lg text-sm font-semibold transition-colors">
+                                Post Comment
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="space-y-4">
+                    <div class="flex space-x-4">
+                        <div class="w-10 h-10 bg-gray-700 rounded-full flex-shrink-0"></div>
+                        <div class="flex-1">
+                            <div class="flex items-center space-x-2 mb-2">
+                                <span class="font-semibold">MovieBuff87</span>
+                                <span class="text-gray-400 text-sm">2 hours ago</span>
+                            </div>
+                            <p class="text-gray-300">
+                                Absolutely mind-blowing movie! Nolan's masterpiece. The layers of dreams within dreams is incredible.
+                            </p>
+                            <div class="flex items-center space-x-4 mt-2">
+                                <button class="text-gray-400 hover:text-white text-sm flex items-center">
+                                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    142
+                                </button>
+                                <button class="text-gray-400 hover:text-white text-sm">Reply</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex space-x-4">
+                        <div class="w-10 h-10 bg-gray-700 rounded-full flex-shrink-0"></div>
+                        <div class="flex-1">
+                            <div class="flex items-center space-x-2 mb-2">
+                                <span class="font-semibold">CinemaLover</span>
+                                <span class="text-gray-400 text-sm">5 hours ago</span>
+                            </div>
+                            <p class="text-gray-300">
+                                The cinematography and Hans Zimmer's score are phenomenal. A true work of art!
+                            </p>
+                            <div class="flex items-center space-x-4 mt-2">
+                                <button class="text-gray-400 hover:text-white text-sm flex items-center">
+                                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    89
+                                </button>
+                                <button class="text-gray-400 hover:text-white text-sm">Reply</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> {% endcomment %}
+    </main>
+
+    <script>
+        const video = document.getElementById('mainVideo');
+const playPauseBtn = document.getElementById('playPauseBtn');
+const playPauseIcon = document.getElementById('playPauseIcon');
+const playPausePath = document.getElementById('playPausePath');
+const stopBtn = document.getElementById('stopBtn');
+const rewindBtn = document.getElementById('rewindBtn');
+const forwardBtn = document.getElementById('forwardBtn');
+const muteBtn = document.getElementById('muteBtn');
+const muteIcon = document.getElementById('muteIcon');
+const fullscreenBtn = document.getElementById('fullscreenBtn');
+const timeDisplay = document.getElementById('timeDisplay');
+
+function formatTime(seconds) {
+    const m = Math.floor(seconds / 60);
+    const s = Math.floor(seconds % 60);
+    return `${m}:${s.toString().padStart(2, '0')}`;
+}
+
+// Play/Pause
+playPauseBtn.addEventListener('click', () => {
+    if (video.paused) {
+        video.play();
+    } else {
+        video.pause();
+    }
+});
+video.addEventListener('play', () => {
+    playPausePath.setAttribute('d', 'M6 4h2v12H6V4zm6 0h2v12h-2V4z'); // Pause icon
+});
+video.addEventListener('pause', () => {
+    playPausePath.setAttribute('d', 'M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z'); // Play icon
+});
+
+// Stop
+stopBtn.addEventListener('click', () => {
+    video.pause();
+    video.currentTime = 0;
+});
+
+// Rewind 10s
+rewindBtn.addEventListener('click', () => {
+    video.currentTime = Math.max(0, video.currentTime - 10);
+});
+
+// Forward 10s
+forwardBtn.addEventListener('click', () => {
+    video.currentTime = Math.min(video.duration, video.currentTime + 10);
+});
+
+// Mute/Unmute
+muteBtn.addEventListener('click', () => {
+    video.muted = !video.muted;
+    muteIcon.innerHTML = video.muted
+        ? '<path d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.617.824L4.75 13.5H3a1 1 0 01-1-1v-5a1 1 0 011-1h1.75l3.633-3.324a1 1 0 011.617.824z" style="opacity:0.3"/>' // Muted style
+        : '<path d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.617.824L4.75 13.5H3a1 1 0 01-1-1v-5a1 1 0 011-1h1.75l3.633-3.324a1 1 0 011.617.824z"/>';
+});
+
+// Fullscreen
+fullscreenBtn.addEventListener('click', () => {
+    if (video.requestFullscreen) {
+        video.requestFullscreen();
+    } else if (video.webkitRequestFullscreen) {
+        video.webkitRequestFullscreen();
+    } else if (video.msRequestFullscreen) {
+        video.msRequestFullscreen();
+    }
+});
+
+// Time display
+video.addEventListener('timeupdate', () => {
+    timeDisplay.textContent = `${formatTime(video.currentTime)} / ${formatTime(video.duration)}`;
+});
+video.addEventListener('loadedmetadata', () => {
+    timeDisplay.textContent = `${formatTime(video.currentTime)} / ${formatTime(video.duration)}`;
+});
+        // Update progress every 100ms
+        setInterval(updateProgress, 100);
+
+        // Movie card hover effects
+        document.querySelectorAll('.movie-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'scale(1.05)';
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'scale(1)';
+            });
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            switch(e.code) {
+                case 'Space':
+                    e.preventDefault();
+                    togglePlay();
+                    break;
+                case 'ArrowLeft':
+                    currentTime = Math.max(0, currentTime - 10);
+                    updateProgressDisplay();
+                    break;
+                case 'ArrowRight':
+                    currentTime = Math.min(duration, currentTime + 10);
+                    updateProgressDisplay();
+                    break;
+            }
+        });
+
+        const progressFill = document.getElementById('progressFill');
+        const progressHandle = document.getElementById('progressHandle');
+
+        function updateProgress() {
+            const percent = (video.currentTime / video.duration) * 100 || 0;
+            progressFill.style.width = percent + '%';
+            progressHandle.style.left = percent + '%';
+        }
+
+        // Update progress bar as video plays
+        video.addEventListener('timeupdate', updateProgress);
+        video.addEventListener('loadedmetadata', updateProgress);
+        video.addEventListener('seeked', updateProgress);
+
+        const playOverlay = document.getElementById('playOverlay');
+        const playButton = document.getElementById('playButton');
+
+        playButton.addEventListener('click', () => {
+            video.play();
+            playOverlay.style.display = 'none';
+        });
+
+        // Optionally, show the overlay again when the video ends
+        video.addEventListener('ended', () => {
+            playOverlay.style.display = 'flex';
+        });
+
+        // Auto-hide controls
+        let controlsTimeout;
+        const videoContainer = document.querySelector('.video-container');
+        
+        videoContainer.addEventListener('mousemove', () => {
+            videoContainer.style.cursor = 'default';
+            clearTimeout(controlsTimeout);
+            
+            controlsTimeout = setTimeout(() => {
+                if (isPlaying) {
+                    videoContainer.style.cursor = 'none';
+                }
+            }, 3000);
+        });
+    </script>
+</body>
+</html>

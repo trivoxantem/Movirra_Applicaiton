@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TV Series - Movirra</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .gradient-bg {
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+        }
+
+        .card-hover {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card-hover:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 25px 50px -12px rgba(124, 58, 237, 0.4);
+        }
+
+        .fade-in {
+            opacity: 0;
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
+
+        .fade-in-delay-1 { animation-delay: 0.1s; }
+        .fade-in-delay-2 { animation-delay: 0.2s; }
+        .fade-in-delay-3 { animation-delay: 0.3s; }
+        .fade-in-delay-4 { animation-delay: 0.4s; }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .slide-in {
+            transform: translateX(-100%);
+            animation: slideIn 0.8s ease-out forwards;
+        }
+
+        @keyframes slideIn {
+            to {
+                transform: translateX(0);
+            }
+        }
+
+        .float {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .glow {
+            box-shadow: 0 0 20px rgba(124, 58, 237, 0.6);
+        }
+
+        .filter-btn {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .filter-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .filter-btn:hover::before {
+            left: 100%;
+        }
+
+        .search-bar {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .series-grid {
+            animation: gridFadeIn 1s ease-out;
+        }
+
+        @keyframes gridFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .rating-star {
+            color: #fbbf24;
+            animation: sparkle 2s ease-in-out infinite;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .genre-tag {
+            background: linear-gradient(45deg, rgba(124, 58, 237, 0.8), rgba(168, 85, 247, 0.8));
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+        }
+
+        .series-card {
+            background: linear-gradient(145deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .load-more {
+            background: linear-gradient(45deg, #7c3aed, #a855f7);
+            transition: all 0.3s ease;
+        }
+
+        .load-more:hover {
+            background: linear-gradient(45deg, #6d28d9, #9333ea);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen text-white">
+    <!-- Navigation -->
+    <nav class="bg-black/20 backdrop-blur-md border-b border-white/10 sticky top-0 z-50 slide-in">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-8">
+                    <div class="flex-shrink-0">
+                        <h1 class="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent float">
+                            MOVIRRA
+                        </h1>
+                    </div>
+                    <div class="hidden md:block">
+                        <div class="ml-10 flex items-baseline space-x-4">
+                            <a href="#" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-white/10 transition-all duration-300">Home</a>
+                            <a href="#" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-white/10 transition-all duration-300">Movies</a>
+                            <a href="#" class="px-3 py-2 rounded-md text-sm font-medium bg-purple-600 text-white">TV Series</a>
+                            <a href="#" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-white/10 transition-all duration-300">My List</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button class="p-2 rounded-full hover:bg-white/10 transition-all duration-300">
+                        <i class="fas fa-search text-lg"></i>
+                    </button>
+                    <button class="p-2 rounded-full hover:bg-white/10 transition-all duration-300">
+                        <i class="fas fa-bell text-lg"></i>
+                    </button>
+                    <div class="w-8 h-8 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full"></div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header Section -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="text-center mb-12">
+            <h1 class="text-5xl font-bold mb-4 bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent fade-in">
+                TV Series Collection
+            </h1>
+            <p class="text-xl text-gray-300 max-w-3xl mx-auto fade-in fade-in-delay-1">
+                Discover binge-worthy series, from gripping dramas to hilarious comedies
+            </p>
+        </div>
+
+        <!-- Search and Filters -->
+        <div class="mb-8 fade-in fade-in-delay-2">
+            <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
+                <div class="relative flex-1 max-w-md">
+                    <input type="text" 
+                           placeholder="Search series..." 
+                           class="w-full px-4 py-3 rounded-xl search-bar text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300"
+                           id="searchInput">
+                    <i class="fas fa-search absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                </div>
+                
+                <div class="flex flex-wrap gap-2">
+                    <button class="filter-btn px-4 py-2 rounded-lg bg-purple-600 text-white font-medium" data-filter="all">All</button>
+                    <button class="filter-btn px-4 py-2 rounded-lg bg-white/10 text-white font-medium hover:bg-white/20" data-filter="drama">Drama</button>
+                    <button class="filter-btn px-4 py-2 rounded-lg bg-white/10 text-white font-medium hover:bg-white/20" data-filter="comedy">Comedy</button>
+                    <button class="filter-btn px-4 py-2 rounded-lg bg-white/10 text-white font-medium hover:bg-white/20" data-filter="action">Action</button>
+                    <button class="filter-btn px-4 py-2 rounded-lg bg-white/10 text-white font-medium hover:bg-white/20" data-filter="sci-fi">Sci-Fi</button>
+                    <button class="filter-btn px-4 py-2 rounded-lg bg-white/10 text-white font-medium hover:bg-white/20" data-filter="thriller">Thriller</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Series Grid -->
+        <div class="series-grid fade-in fade-in-delay-3" id="seriesGrid">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                <!-- Series cards will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Load More Button -->
+        <div class="text-center mt-12 fade-in fade-in-delay-4">
+            <button class="load-more px-8 py-3 rounded-xl text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300" id="loadMoreBtn">
+                <i class="fas fa-plus mr-2"></i>
+                Load More Series
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Sample series data
+        const seriesData = [
+            {
+                id: 1,
+                title: "Stranger Things",
+                poster: "https://images.unsplash.com/photo-1489599735677-3935975df0b7?w=300&h=450&fit=crop",
+                rating: 8.7,
+                year: "2016-2025",
+                genre: "sci-fi",
+                seasons: 4,
+                description: "When a young boy vanishes, a small town uncovers a mystery involving secret experiments."
+            },
+            {
+                id: 2,
+                title: "Breaking Bad",
+                poster: "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=300&h=450&fit=crop",
+                rating: 9.5,
+                year: "2008-2013",
+                genre: "drama",
+                seasons: 5,
+                description: "A high school chemistry teacher turned methamphetamine producer."
+            },
+            {
+                id: 3,
+                title: "The Office",
+                poster: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=300&h=450&fit=crop",
+                rating: 8.9,
+                year: "2005-2013",
+                genre: "comedy",
+                seasons: 9,
+                description: "A mockumentary on a group of typical office workers."
+            },
+            {
+                id: 4,
+                title: "Game of Thrones",
+                poster: "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=300&h=450&fit=crop",
+                rating: 9.3,
+                year: "2011-2019",
+                genre: "drama",
+                seasons: 8,
+                description: "Nine noble families wage war against each other for control over the Iron Throne."
+            },
+            {
+                id: 5,
+                title: "Marvel's Daredevil",
+                poster: "https://images.unsplash.com/photo-1571847140471-1d7766e825ea?w=300&h=450&fit=crop",
+                rating: 8.6,
+                year: "2015-2018",
+                genre: "action",
+                seasons: 3,
+                description: "A blind lawyer by day, vigilante by night."
+            },
+            {
+                id: 6,
+                title: "Mindhunter",
+                poster: "https://images.unsplash.com/photo-1489599735677-3935975df0b7?w=300&h=450&fit=crop",
+                rating: 8.6,
+                year: "2017-2019",
+                genre: "thriller",
+                seasons: 2,
+                description: "FBI agents interview imprisoned serial killers to solve ongoing cases."
+            },
+            {
+                id: 7,
+                title: "Friends",
+                poster: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=300&h=450&fit=crop",
+                rating: 8.9,
+                year: "1994-2004",
+                genre: "comedy",
+                seasons: 10,
+                description: "Follows the personal and professional lives of six friends."
+            },
+            {
+                id: 8,
+                title: "Westworld",
+                poster: "https://images.unsplash.com/photo-1571847140471-1d7766e825ea?w=300&h=450&fit=crop",
+                rating: 8.6,
+                year: "2016-2022",
+                genre: "sci-fi",
+                seasons: 4,
+                description: "Set at the intersection of the near future and the reimagined past."
+            },
+            {
+                id: 9,
+                title: "House of Cards",
+                poster: "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=300&h=450&fit=crop",
+                rating: 8.7,
+                year: "2013-2018",
+                genre: "drama",
+                seasons: 6,
+                description: "A Congressman works with his wife to exact revenge on those who betrayed him."
+            },
+            {
+                id: 10,
+                title: "The Mandalorian",
+                poster: "https://images.unsplash.com/photo-1489599735677-3935975df0b7?w=300&h=450&fit=crop",
+                rating: 8.7,
+                year: "2019-2023",
+                genre: "action",
+                seasons: 3,
+                description: "The travels of a lone bounty hunter in the outer reaches of the galaxy."
+            },
+            {
+                id: 11,
+                title: "Sherlock",
+                poster: "https://images.unsplash.com/photo-1571847140471-1d7766e825ea?w=300&h=450&fit=crop",
+                rating: 9.1,
+                year: "2010-2017",
+                genre: "thriller",
+                seasons: 4,
+                description: "A modern update finds the famous sleuth and his doctor partner solving crime."
+            },
+            {
+                id: 12,
+                title: "Brooklyn Nine-Nine",
+                poster: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=300&h=450&fit=crop",
+                rating: 8.4,
+                year: "2013-2021",
+                genre: "comedy",
+                seasons: 8,
+                description: "Comedy series following the exploits of Det. Jake Peralta."
+            }
+        ];
+
+        let currentFilter = 'all';
+        let displayedSeries = 8;
+        let filteredSeries = seriesData;
+
+        function createSeriesCard(series, index) {
+            return `
+                <div class="series-card rounded-xl overflow-hidden card-hover fade-in" style="animation-delay: ${index * 0.1}s" data-genre="${series.genre}">
+                    <div class="relative group">
+                        <img src="${series.poster}" alt="${series.title}" class="w-full h-64 object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <div class="absolute top-3 right-3">
+                            <span class="genre-tag px-2 py-1 text-xs font-semibold text-white rounded-full">${series.genre.toUpperCase()}</span>
+                        </div>
+                        <div class="absolute bottom-3 left-3 right-3 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 opacity-0 group-hover:opacity-100">
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="flex items-center space-x-1">
+                                    <i class="fas fa-star rating-star text-sm"></i>
+                                    <span class="text-sm font-semibold">${series.rating}</span>
+                                </div>
+                                <span class="text-xs text-gray-300">${series.seasons} Seasons</span>
+                            </div>
+                            <button class="w-full bg-white/20 backdrop-blur-sm text-white py-2 rounded-lg hover:bg-white/30 transition-all duration-300">
+                                <i class="fas fa-play mr-2"></i>Watch Now
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-semibold text-lg mb-1 line-clamp-1">${series.title}</h3>
+                        <p class="text-gray-400 text-sm mb-2">${series.year}</p>
+                        <p class="text-gray-300 text-sm line-clamp-2">${series.description}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderSeries() {
+            const grid = document.getElementById('seriesGrid').querySelector('.grid');
+            const seriesToShow = filteredSeries.slice(0, displayedSeries);
+            
+            grid.innerHTML = seriesToShow.map((series, index) => createSeriesCard(series, index)).join('');
+            
+            // Update load more button
+            const loadMoreBtn = document.getElementById('loadMoreBtn');
+            if (displayedSeries >= filteredSeries.length) {
+                loadMoreBtn.style.display = 'none';
+            } else {
+                loadMoreBtn.style.display = 'inline-flex';
+            }
+        }
+
+        function filterSeries(genre) {
+            currentFilter = genre;
+            if (genre === 'all') {
+                filteredSeries = seriesData;
+            } else {
+                filteredSeries = seriesData.filter(series => series.genre === genre);
+            }
+            displayedSeries = 8;
+            renderSeries();
+        }
+
+        function searchSeries(query) {
+            if (query.trim() === '') {
+                filterSeries(currentFilter);
+                return;
+            }
+            
+            filteredSeries = seriesData.filter(series => 
+                series.title.toLowerCase().includes(query.toLowerCase()) ||
+                series.description.toLowerCase().includes(query.toLowerCase()) ||
+                series.genre.toLowerCase().includes(query.toLowerCase())
+            );
+            displayedSeries = 8;
+            renderSeries();
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            renderSeries();
+
+            // Filter buttons
+            document.querySelectorAll('[data-filter]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('[data-filter]').forEach(b => {
+                        b.classList.remove('bg-purple-600');
+                        b.classList.add('bg-white/10');
+                    });
+                    this.classList.add('bg-purple-600');
+                    this.classList.remove('bg-white/10');
+                    
+                    filterSeries(this.dataset.filter);
+                });
+            });
+
+            // Search input
+            document.getElementById('searchInput').addEventListener('input', function() {
+                searchSeries(this.value);
+            });
+
+            // Load more button
+            document.getElementById('loadMoreBtn').addEventListener('click', function() {
+                displayedSeries += 8;
+                renderSeries();
+            });
+        });
+
+        // Add CSS for line clamp
+        const style = document.createElement('style');
+        style.textContent = `
+            .line-clamp-1 {
+                display: -webkit-box;
+                -webkit-line-clamp: 1;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+            }
+            .line-clamp-2 {
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
